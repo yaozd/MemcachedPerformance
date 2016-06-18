@@ -13,7 +13,7 @@ namespace MemcachedPerformance
         static readonly MyLog log = new MyLog();
         //原子计数
         public static int Count;
-        //原子计数
+        //错误原子计数
         public static int ErrorCount;
         //
         public static int TestDataSize = 1 * 1024;
@@ -32,10 +32,10 @@ namespace MemcachedPerformance
                     PerformanceTest.Time("Test_Set", 40, 5000, (Test_Set));
                     PerformanceTest.Time("Test_Get", 40, 5000, (Test_Get));
                     //
-                    throw new Exception("aa");
                 }
                 catch (Exception ex)
                 {
+                    //记录报错信息
                     var current = Interlocked.Increment(ref ErrorCount);
                     log.Write(string.Format("2-Error-Count-{0}-{1}",current,DateTime.Now));
                     log.Write(string.Format("2-Error-Count-{0}-{1}",current,ex.Message));
