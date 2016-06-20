@@ -46,12 +46,16 @@ namespace MemcachedPerformance
                 //通过锁来控制客户端的释放
                 lock (LockObject)
                 {
-                    _index = tt;
-                    var t1 = (t + 1)%_clientNum;
-                    //重新加载实体
-                    _clients[t1].Dispose();
-                    _clients[t1] = null;
-                    _clients[t1] = LoadClient();
+                    //用最小的性能代价-尽可能的保证线程安全
+                    if (tt != _index)
+                    {
+                        _index = tt;
+                        var t1 = (t + 1)%_clientNum;
+                        //重新加载实体
+                        _clients[t1].Dispose();
+                        _clients[t1] = null;
+                        _clients[t1] = LoadClient();
+                    }
                 }
             }
             if (_client == null) SetMemcachedClient();
